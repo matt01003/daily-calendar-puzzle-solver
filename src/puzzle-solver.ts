@@ -125,12 +125,9 @@ export const formatSolution = (
   solution: { index: number; maskIndex: number }[]
 ): string[][] => {
   const board = puzzleByType[type].map((row) => row.split(""))
-  console.log(board.join("\n"))
-  console.log(solution)
   solution.forEach(({ index, maskIndex }, itemIndex) => {
     placeOrRemove(board, index, itemIndex, maskIndex, itemIndex.toString())
   })
-  console.log("bbb", board)
   return board
 }
 
