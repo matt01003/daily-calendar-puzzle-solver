@@ -1,0 +1,30 @@
+.cellContainer {
+  flex-wrap: wrap;
+  display: flex;
+  // width: 350px;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.board {
+  position: relative;
+  border-width: 0px 0px 0px 1px;
+  border-color: black;
+  border-style: solid;
+  flex-wrap: wrap;
+}
+
+.buttonContainer {
+  display: flex;
+  padding-top: 10px;
+  align-items: center;
+  gap: 10px;
+}
+
+.spacer {
+  // width: 50px;
+  flex: 1 1 calc(100% / 7);
+}
