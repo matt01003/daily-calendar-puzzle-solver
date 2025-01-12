@@ -40,12 +40,14 @@ export default function Board() {
   ) => {
     return labels.map((e: number | string, i: number) => {
       const index = rangeStart + i
+      const row = Math.floor(i / 7) + rowOffset
+      const col = (i % 7) + colOffset
       return (
         <Cell
           key={index}
           board={formattedSolutions}
-          i={Math.floor(i / 7) + rowOffset}
-          j={(i % 7) + colOffset}
+          row={row}
+          col={col}
           onClick={() => updateDate(index)}
         >
           {typeof e === "string" ? e : e < 10 ? "0" + e : e}

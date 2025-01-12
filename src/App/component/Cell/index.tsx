@@ -1,11 +1,12 @@
 import { animated, useSpring } from "@react-spring/web"
 import styles from "./style.module.scss"
 import { ReactNode } from "react"
+import Button from "../Button"
 
 type Props = {
   board: string[][]
-  i: number
-  j: number
+  row: number
+  col: number
   onClick: Function
   children: ReactNode
 }
@@ -25,33 +26,40 @@ const colors: { [key: string]: string } = {
 }
 
 export default function Cell(props: Props) {
-  const { board, i, j, onClick, children } = props
+  const { board, row, col, onClick, children } = props
 
   const cellColor = useSpring({
-    backgroundColor: colors[board[i][j]],
+    backgroundColor: colors[board[row][col]],
     config: { duration: 500 },
   })
 
-  const cellBorder = (board: string[][], i: number, j: number) => {
-    const top = !board[i - 1] || board[i][j] !== board[i - 1][j] ? 1 : 0
-    const right = board[i][j] !== board[i][j + 1] && board[i][j] !== "x" ? 1 : 0
-    const bottom = !board[i + 1] || board[i + 1][j] === "x" ? 1 : 0
-    const left = !board[i][j - 1] || board[i][j - 1] === "x" ? 1 : 0
+  const cellBorder = (board: string[][], row: number, col: number) => {
+    const top =
+      !board[row - 1] || board[row][col] !== board[row - 1][col] ? 1.5 : 0
+    const right =
+      board[row][col] !== board[row][col + 1] && board[row][col] !== "x"
+        ? 1.5
+        : 0
+    const bottom = !board[row + 1] || board[row + 1][col] === "x" ? 1.5 : 0
+    const left = !board[row][col - 1] || board[row][col - 1] === "x" ? 1.5 : 0
 
     return { borderWidth: `${top}px ${right}px ${bottom}px ${left}px` }
   }
 
   return (
     <div className={styles.container}>
-      <animated.div
+      <animated.button
         className={styles.cell}
-        style={{
-          ...cellBorder(board, i, j),
-          ...cellColor,
-        }}
+        disabled={board[row][col] === "."}
+        style={{ ...cellBorder(board, row, col), ...cellColor }}
         onClick={() => onClick()}
-      ></animated.div>
-      <div className={styles.text}>{children}</div>
+      ></animated.button>
+      <div
+        className={styles.text}
+        style={board[row][col] === "." ? { fontWeight: "600" } : {}}
+      >
+        {children}
+      </div>
     </div>
   )
 }
