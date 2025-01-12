@@ -1,7 +1,6 @@
 import { animated, useSpring } from "@react-spring/web"
 import styles from "./style.module.scss"
 import { ReactNode } from "react"
-import Button from "../Button"
 
 type Props = {
   board: string[][]
