@@ -19,23 +19,36 @@ const MONTHS = [
   "DEC",
 ]
 
-export default function PuzzleBoard() {
-  const { count, setCount, solutions, formattedSolutions, updateDate } =
-    useBoard()
+export default function Board() {
+  const {
+    type,
+    setType,
+    count,
+    setCount,
+    solutions,
+    formattedSolutions,
+    updateDate,
+  } = useBoard()
+
   if (!formattedSolutions) return null
 
-  const renderCells = (rangeStart: number, rowOffset: number, labels?: any) => {
-    return labels.map((e: any, i: number) => {
+  const renderCells = (
+    rangeStart: number,
+    rowOffset: number,
+    colOffset: number,
+    labels: number[] | string[]
+  ) => {
+    return labels.map((e: number | string, i: number) => {
       const index = rangeStart + i
       return (
         <Cell
           key={index}
           board={formattedSolutions}
           i={Math.floor(i / 7) + rowOffset}
-          j={i % 7}
+          j={(i % 7) + colOffset}
           onClick={() => updateDate(index)}
         >
-          {e < 10 ? "0" + e : e}
+          {typeof e === "string" ? e : e < 10 ? "0" + e : e}
         </Cell>
       )
     })
@@ -45,30 +58,61 @@ export default function PuzzleBoard() {
     <>
       <div className={styles.board}>
         <div className={styles.cellContainer}>
-          {renderCells(0, 0, MONTHS.slice(0, 6))}
-          <div className={styles.spacer}></div>
-          {renderCells(6, 1, MONTHS.slice(6, 12))}
-          <div className={styles.spacer}></div>
-          {renderCells(MONTHS.length, 2, range(1, 32))}
-          <div className={styles.spacer}></div>
-          <div className={styles.spacer}></div>
-          <div className={styles.spacer}></div>
-          <div className={styles.spacer}></div>
+          {type === "DEFAULT" && (
+            <>
+              {renderCells(0, 0, 0, MONTHS.slice(0, 6))}
+              <div className={styles.spacer}></div>
+              {renderCells(6, 1, 0, MONTHS.slice(6, 12))}
+              <div className={styles.spacer}></div>
+            </>
+          )}
+          {type === "CENTER" && (
+            <>
+              <div className={styles.spacer}></div>
+              {renderCells(0, 0, 1, MONTHS.slice(0, 5))}
+              <div className={styles.spacer}></div>
+              {renderCells(6, 1, 0, MONTHS.slice(5, 13))}
+            </>
+          )}
+          {renderCells(MONTHS.length, 2, 0, range(1, 32))}
+          {/* {type === "STANDARD" ? (
+            <>
+              {renderCells(MONTHS.length, 6, 3, ["MON", "TUE", "WED", "THU"])}
+              <div className={styles.spacer}></div>
+              <div className={styles.spacer}></div>
+              <div className={styles.spacer}></div>
+              <div className={styles.spacer}></div>
+              {renderCells(MONTHS.length, 7, 4, ["FRI", "SAT", "SUN"])}
+            </>
+          ) : ( */}
+          <>
+            <div className={styles.spacer}></div>
+            <div className={styles.spacer}></div>
+            <div className={styles.spacer}></div>
+            <div className={styles.spacer}></div>
+          </>
+          {/* )} */}
         </div>
       </div>
       <div className={styles.buttonContainer}>
         <Button disabled={count === 0} onClick={() => setCount(count - 1)}>
-          prev
+          Prev
         </Button>
         <Button
           disabled={count === solutions.length - 1}
           onClick={() => setCount(count + 1)}
         >
-          next
+          Next
         </Button>
         <div>
           {count + 1}/{solutions.length}
         </div>
+        <Button
+          style={{ marginLeft: "auto" }}
+          onClick={() => setType(type === "CENTER" ? "DEFAULT" : "CENTER")}
+        >
+          {type}
+        </Button>
       </div>
     </>
   )

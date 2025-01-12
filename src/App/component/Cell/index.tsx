@@ -10,7 +10,7 @@ type Props = {
   children: ReactNode
 }
 
-const colors: any = {
+const colors: { [key: string]: string } = {
   0: "#6B7280",
   1: "#EF4444",
   2: "#F59E0B",
@@ -32,11 +32,11 @@ export default function Cell(props: Props) {
     config: { duration: 500 },
   })
 
-  const cellBorder = (board: any, i: number, j: number) => {
+  const cellBorder = (board: string[][], i: number, j: number) => {
     const top = !board[i - 1] || board[i][j] !== board[i - 1][j] ? 1 : 0
     const right = board[i][j] !== board[i][j + 1] && board[i][j] !== "x" ? 1 : 0
     const bottom = !board[i + 1] || board[i + 1][j] === "x" ? 1 : 0
-    const left = 0
+    const left = !board[i][j - 1] || board[i][j - 1] === "x" ? 1 : 0
 
     return { borderWidth: `${top}px ${right}px ${bottom}px ${left}px` }
   }
@@ -45,7 +45,10 @@ export default function Cell(props: Props) {
     <div className={styles.container}>
       <animated.div
         className={styles.cell}
-        style={{ ...cellBorder(board, i, j), ...cellColor }}
+        style={{
+          ...cellBorder(board, i, j),
+          ...cellColor,
+        }}
         onClick={() => onClick()}
       ></animated.div>
       <div className={styles.text}>{children}</div>

@@ -1,9 +1,14 @@
 import { uniqBy } from "lodash"
 
-type PuzzleType = "LEFT" | "CENTER"
+export type PuzzleType = "DEFAULT" | "CENTER"
 
-export const puzzleByType: Record<PuzzleType, string[]> = {
-  LEFT: [
+export type BoardType = {
+  DEFAULT: string[]
+  CENTER: string[]
+}
+
+export const boardType: BoardType = {
+  DEFAULT: [
     "......x",
     "......x",
     ".......",
@@ -37,7 +42,6 @@ export const items = [
   ["x..", "x..", "xxx"],
 ]
 
-// Utility function to rotate a 2D grid
 const rotate = (item: string[]): string[] => {
   return item[0].split("").map((_, colIndex) =>
     item
@@ -47,12 +51,10 @@ const rotate = (item: string[]): string[] => {
   )
 }
 
-// Utility function to flip a 2D grid horizontally
 const flip = (item: string[]): string[] => {
   return item.map((row) => row.split("").reverse().join(""))
 }
 
-// Precompute all item masks (rotations and flips)
 export const itemMasks = items.map((item) => {
   const transformations: string[][] = [item]
   for (let i = 1; i < 4; i++) {
@@ -64,7 +66,6 @@ export const itemMasks = items.map((item) => {
   return uniqBy(transformations, (x) => x.join("\n"))
 })
 
-// Precompute the first column containing "x" for each mask
 export const firstXCols = itemMasks.map((masks) =>
   masks.map((mask) => mask[0].indexOf("x"))
 )
@@ -124,7 +125,7 @@ export const formatSolution = (
   type: PuzzleType,
   solution: { index: number; maskIndex: number }[]
 ): string[][] => {
-  const board = puzzleByType[type].map((row) => row.split(""))
+  const board = boardType[type].map((row) => row.split(""))
   solution.forEach(({ index, maskIndex }, itemIndex) => {
     placeOrRemove(board, index, itemIndex, maskIndex, itemIndex.toString())
   })
@@ -132,10 +133,9 @@ export const formatSolution = (
 }
 
 export const createBoard = (type: PuzzleType, month: number, day: number) => {
-  const board = puzzleByType[type].map((row) => row.split(""))
+  const board = boardType[type].map((row) => row.split(""))
 
-  // Mark month and day on the board
-  if (type === "LEFT") {
+  if (type === "DEFAULT") {
     board[Math.floor(month / 6)][month % 6] = "x"
   } else {
     if (month < 5) {
