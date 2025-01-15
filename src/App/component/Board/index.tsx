@@ -19,6 +19,8 @@ const MONTHS = [
   "DEC",
 ]
 
+const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
+
 export default function Board() {
   const {
     type,
@@ -42,6 +44,8 @@ export default function Board() {
       const index = rangeStart + i
       const row = Math.floor(i / 7) + rowOffset
       const col = (i % 7) + colOffset
+
+      if (!formattedSolutions[row]) return
       return (
         <Cell
           key={index}
@@ -60,40 +64,28 @@ export default function Board() {
     <>
       <div className={styles.board}>
         <div className={styles.cellContainer}>
-          {type === "DEFAULT" && (
-            <>
-              {renderCells(0, 0, 0, MONTHS.slice(0, 6))}
-              <div className={styles.spacer}></div>
-              {renderCells(6, 1, 0, MONTHS.slice(6, 12))}
-              <div className={styles.spacer}></div>
-            </>
-          )}
-          {type === "CENTER" && (
-            <>
-              <div className={styles.spacer}></div>
-              {renderCells(0, 0, 1, MONTHS.slice(0, 5))}
-              <div className={styles.spacer}></div>
-              {renderCells(6, 1, 0, MONTHS.slice(5, 13))}
-            </>
-          )}
+          {renderCells(0, 0, 0, MONTHS.slice(0, 6))}
+          <div className={styles.spacer2}></div>
+          {renderCells(6, 1, 0, MONTHS.slice(6, 12))}
+          <div className={styles.spacer2}></div>
           {renderCells(MONTHS.length, 2, 0, range(1, 32))}
-          {/* {type === "STANDARD" ? (
+          {type === "STANDARD" ? (
             <>
-              {renderCells(MONTHS.length, 6, 3, ["MON", "TUE", "WED", "THU"])}
+              {renderCells(MONTHS.length + 31, 6, 3, WEEKDAYS.slice(0, 4))}
               <div className={styles.spacer}></div>
               <div className={styles.spacer}></div>
               <div className={styles.spacer}></div>
               <div className={styles.spacer}></div>
-              {renderCells(MONTHS.length, 7, 4, ["FRI", "SAT", "SUN"])}
+              {renderCells(MONTHS.length + 35, 7, 4, WEEKDAYS.slice(4, 7))}
             </>
-          ) : ( */}
-          <>
-            <div className={styles.spacer}></div>
-            <div className={styles.spacer}></div>
-            <div className={styles.spacer}></div>
-            <div className={styles.spacer}></div>
-          </>
-          {/* )} */}
+          ) : (
+            <>
+              <div className={styles.spacer}></div>
+              <div className={styles.spacer}></div>
+              <div className={styles.spacer}></div>
+              <div className={styles.spacer}></div>
+            </>
+          )}
         </div>
       </div>
       <div className={styles.buttonContainer}>
@@ -111,7 +103,7 @@ export default function Board() {
         </div>
         <Button
           style={{ marginLeft: "auto" }}
-          onClick={() => setType(type === "CENTER" ? "DEFAULT" : "CENTER")}
+          onClick={() => setType(type === "STANDARD" ? "DEFAULT" : "STANDARD")}
         >
           {type}
         </Button>

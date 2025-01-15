@@ -1,9 +1,10 @@
 import { animated, useSpring } from "@react-spring/web"
 import styles from "./style.module.scss"
 import { ReactNode } from "react"
+import { Board } from "../../../puzzle-solver"
 
 type Props = {
-  board: string[][]
+  board: Board
   row: number
   col: number
   onClick: Function
@@ -28,19 +29,17 @@ export default function Cell(props: Props) {
   const { board, row, col, onClick, children } = props
 
   const cellColor = useSpring({
-    backgroundColor: colors[board[row][col]],
+    backgroundColor: colors[board[row][col] as string],
     config: { duration: 500 },
   })
 
-  const cellBorder = (board: string[][], row: number, col: number) => {
+  const cellBorder = (board: Board, row: number, col: number) => {
     const top =
       !board[row - 1] || board[row][col] !== board[row - 1][col] ? 1.5 : 0
     const right =
-      board[row][col] !== board[row][col + 1] && board[row][col] !== "x"
-        ? 1.5
-        : 0
-    const bottom = !board[row + 1] || board[row + 1][col] === "x" ? 1.5 : 0
-    const left = !board[row][col - 1] || board[row][col - 1] === "x" ? 1.5 : 0
+      board[row][col] !== board[row][col + 1] && board[row][col] ? 1.5 : 0
+    const bottom = !board[row + 1] ? 1.5 : 0
+    const left = !board[row][col - 1] && board[row][col] ? 1.5 : 0
 
     return { borderWidth: `${top}px ${right}px ${bottom}px ${left}px` }
   }
@@ -50,12 +49,15 @@ export default function Cell(props: Props) {
       <animated.button
         className={styles.cell}
         disabled={board[row][col] === "."}
-        style={{ ...cellBorder(board, row, col), ...cellColor }}
+        style={cellColor}
         onClick={() => onClick()}
       ></animated.button>
       <div
         className={styles.text}
-        style={board[row][col] === "." ? { fontWeight: "600" } : {}}
+        style={{
+          ...cellBorder(board, row, col),
+          fontWeight: board[row][col] === "." ? 600 : 500,
+        }}
       >
         {children}
       </div>

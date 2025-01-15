@@ -13,10 +13,11 @@ export default function useBoard() {
   const [selectedDate, setSelectedDate] = useState({
     month: new Date().getMonth(),
     day: new Date().getDate(),
+    weekday: new Date().getDay(),
   })
 
   const boardSolver = useMemo(
-    () => createBoard(type, selectedDate.month, selectedDate.day),
+    () => createBoard(type, selectedDate),
     [selectedDate, type]
   )
 
@@ -26,9 +27,14 @@ export default function useBoard() {
   }, [solutions, count])
 
   const updateDate = useCallback((index: number) => {
-    setSelectedDate((prev) =>
-      index < 12 ? { ...prev, month: index } : { ...prev, day: index - 11 }
-    )
+    setSelectedDate((prev) => ({
+      ...prev,
+      ...(index < 12
+        ? { month: index }
+        : index < 43
+        ? { day: index - 11 }
+        : { weekday: index - 43 }),
+    }))
   }, [])
 
   useEffect(() => {
