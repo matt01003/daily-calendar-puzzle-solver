@@ -20,9 +20,9 @@ const colors: { [key: string]: string } = {
   5: "#6366F1",
   6: "#8B5CF6",
   7: "#EC4899",
-  8: "red",
-  9: "blue",
-  ".": "lightgray",
+  8: "#FF0000",
+  9: "#0000FF",
+  ".": "#D3D3D3",
 }
 
 export default function Cell(props: Props) {
@@ -39,7 +39,7 @@ export default function Cell(props: Props) {
     const right =
       board[row][col] !== board[row][col + 1] && board[row][col] ? 1.5 : 0
     const bottom = !board[row + 1] ? 1.5 : 0
-    const left = !board[row][col - 1] && board[row][col] ? 1.5 : 0
+    const left = col === 0 ? 1.5 : 0
 
     return { borderWidth: `${top}px ${right}px ${bottom}px ${left}px` }
   }

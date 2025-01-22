@@ -72,18 +72,21 @@ export default function Board() {
           {type === "STANDARD" ? (
             <>
               {renderCells(MONTHS.length + 31, 6, 3, WEEKDAYS.slice(0, 4))}
-              <div className={styles.spacer}></div>
-              <div className={styles.spacer}></div>
-              <div className={styles.spacer}></div>
-              <div className={styles.spacer}></div>
+              <div className={styles.spacer} />
+              <div className={styles.spacer} />
+              <div className={styles.spacer} />
+              <div
+                className={styles.spacer}
+                style={{ borderRightWidth: 1.5 }}
+              />
               {renderCells(MONTHS.length + 35, 7, 4, WEEKDAYS.slice(4, 7))}
             </>
           ) : (
             <>
-              <div className={styles.spacer}></div>
-              <div className={styles.spacer}></div>
-              <div className={styles.spacer}></div>
-              <div className={styles.spacer}></div>
+              <div className={styles.spacer} />
+              <div className={styles.spacer} />
+              <div className={styles.spacer} />
+              <div className={styles.spacer} />
             </>
           )}
         </div>
