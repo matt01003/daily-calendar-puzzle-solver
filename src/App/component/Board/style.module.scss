@@ -4,11 +4,6 @@
   gap: 0;
 }
 
-.row {
-  display: flex;
-  flex-direction: row;
-}
-
 .board {
   position: relative;
   flex-wrap: wrap;
@@ -30,4 +25,8 @@
 
 .spacer2 {
   flex: 1 1 calc(100% / 7);
+}
+
+.noSolution {
+  padding: 1rem 0;
 }

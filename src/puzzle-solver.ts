@@ -34,7 +34,7 @@ export const puzzleDimensions: Record<PuzzleType, PuzzleDimensions> = {
   STANDARD: { ROWS: 8, COLS: 7 },
 }
 
-export const items = {
+export const items: Record<PuzzleType, Item[]> = {
   DEFAULT: [
     ["x...", "xxxx"],
     ["x..", "xxx", "..x"],
@@ -89,6 +89,9 @@ export const computeItemMasks = (category: PuzzleType): Item[][] => {
 }
 
 export const computeFirstXCols = (itemMasks: Item[][]): number[][] => {
+  // Relies on every mask orientation having an "x" in its top row; otherwise
+  // indexOf returns -1 and placement would shift off-grid. True for all current
+  // pieces, but it is an implicit invariant rather than an enforced one.
   return itemMasks.map((masks) => masks.map((mask) => mask[0].indexOf("x")))
 }
 
@@ -202,7 +205,7 @@ export const formatSolution = (
 
 // Builds the wall layout with the given date's month/day/weekday cells marked
 // as blocked ("x"). Pieces may not be placed on any "x" cell.
-export const buildBoard = (type: PuzzleType, date: PuzzleDate): Board => {
+export const buildBoard = (type: PuzzleType, date: PuzzleDate): string[][] => {
   const board = puzzleByType[type].map((row) => row.split(""))
   const { month, day, weekday } = getDateCells(type, date)
 
@@ -216,21 +219,22 @@ export const buildBoard = (type: PuzzleType, date: PuzzleDate): Board => {
 }
 
 // Depth-first backtracking search over the given board (mutated in place,
-// restored on return). Returns up to 10 solutions for STANDARD, unbounded for
-// DEFAULT.
+// restored on return). Returns up to MAX_SOLUTIONS solutions; capping both
+// types keeps DEFAULT from running the full search tree and blocking the UI.
 export const solve = (
   type: PuzzleType,
   board: Board
 ): { index: number; maskIndex: number }[][] => {
   const { itemMasks, firstXCols } = getItemMasksAndFirstXCols(type)
   const { ROWS, COLS } = puzzleDimensions[type]
+  const MAX_SOLUTIONS = 10
   const solutions: { index: number; maskIndex: number }[][] = []
   const solution: ({ index: number; maskIndex: number } | null)[] =
     itemMasks.map(() => null)
   let foundSolutions = 0
 
   const dfs = (index: number) => {
-    if (foundSolutions >= 10 && type === "STANDARD") return
+    if (foundSolutions >= MAX_SOLUTIONS) return
 
     if (index >= ROWS * COLS) {
       solutions.push(solution.map((s) => s!))

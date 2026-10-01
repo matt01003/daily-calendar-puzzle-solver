@@ -32,7 +32,9 @@ export default function Board() {
     updateDate,
   } = useBoard()
 
-  if (!formattedSolutions) return null
+  if (!formattedSolutions) {
+    return <div className={styles.noSolution}>No solution found for this date.</div>
+  }
 
   const renderCells = (
     rangeStart: number,

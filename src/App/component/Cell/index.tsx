@@ -11,7 +11,7 @@ type Props = {
   children: ReactNode
 }
 
-const colors: { [key: string]: string } = {
+const colors: Record<string, string> = {
   0: "#6B7280",
   1: "#EF4444",
   2: "#F59E0B",
@@ -29,7 +29,7 @@ export default function Cell(props: Props) {
   const { board, row, col, onClick, children } = props
 
   const cellColor = useSpring({
-    backgroundColor: colors[board[row][col] as string],
+    backgroundColor: colors[board[row][col] ?? "."],
     config: { duration: 500 },
   })
 

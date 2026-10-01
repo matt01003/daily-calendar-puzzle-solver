@@ -21,8 +21,6 @@ export default function useBoard() {
     weekday: new Date().getDay(),
   })
 
-  const board = useMemo(() => buildBoard(type, selectedDate), [selectedDate, type])
-
   const formattedSolutions = useMemo(() => {
     if (!solutions.length) return null
     return formatSolution(type, solutions[count])
@@ -40,9 +38,9 @@ export default function useBoard() {
   }, [])
 
   useEffect(() => {
-    setSolutions(solve(type, board))
+    setSolutions(solve(type, buildBoard(type, selectedDate)))
     setCount(0)
-  }, [type, board])
+  }, [type, selectedDate])
 
   return {
     type,
