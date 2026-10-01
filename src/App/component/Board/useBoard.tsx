@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import {
   buildBoard,
+  DateCellKind,
   formatSolution,
   PuzzleType,
   solve,
@@ -26,15 +27,19 @@ export default function useBoard() {
     return formatSolution(type, solutions[count])
   }, [type, solutions, count])
 
-  const updateDate = useCallback((index: number) => {
-    setSelectedDate((prev) => ({
-      ...prev,
-      ...(index < 12
-        ? { month: index }
-        : index < 43
-        ? { day: index - 11 }
-        : { weekday: index - 43 }),
-    }))
+  const updateDate = useCallback((kind: DateCellKind, value: number) => {
+    setSelectedDate((prev) => {
+      switch (kind) {
+        case "month":
+          return { ...prev, month: value }
+        case "day":
+          return { ...prev, day: value }
+        case "weekday":
+          return { ...prev, weekday: value }
+        default:
+          return prev
+      }
+    })
   }, [])
 
   useEffect(() => {

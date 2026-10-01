@@ -5,6 +5,7 @@ import {
   formatSolution,
   getDateCells,
   getItemMasksAndFirstXCols,
+  getLabeledCells,
   items,
   PuzzleType,
   puzzleByType,
@@ -124,6 +125,38 @@ describe("getDateCells", () => {
     expect(cells(3)).toEqual({ row: 6, col: 6 })
     expect(cells(4)).toEqual({ row: 7, col: 4 })
     expect(cells(6)).toEqual({ row: 7, col: 6 })
+  })
+})
+
+describe("getLabeledCells", () => {
+  it.each(["DEFAULT", "STANDARD"] as const)(
+    "%s covers every non-wall cell exactly once",
+    (type) => {
+      const cells = getLabeledCells(type)
+      const layout = puzzleByType[type]
+
+      const seen = new Set<string>()
+      for (const cell of cells) {
+        expect(layout[cell.row][cell.col]).toBe(".")
+        const key = `${cell.row},${cell.col}`
+        expect(seen.has(key)).toBe(false)
+        seen.add(key)
+      }
+
+      const nonWallCount = layout
+        .join("")
+        .split("")
+        .filter((c) => c === ".").length
+      expect(cells).toHaveLength(nonWallCount)
+    }
+  )
+
+  it("orders months then days with the expected positions", () => {
+    const cells = getLabeledCells("DEFAULT")
+    expect(cells[0]).toEqual({ kind: "month", value: 0, row: 0, col: 0 })
+    expect(cells[11]).toEqual({ kind: "month", value: 11, row: 1, col: 5 })
+    expect(cells[12]).toEqual({ kind: "day", value: 1, row: 2, col: 0 })
+    expect(cells[42]).toEqual({ kind: "day", value: 31, row: 6, col: 2 })
   })
 })
 

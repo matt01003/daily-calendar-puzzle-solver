@@ -1,8 +1,13 @@
+import { ReactElement } from "react"
 import styles from "./style.module.scss"
-import { range } from "lodash"
 import Button from "../Button"
 import Cell from "../Cell"
 import useBoard from "./useBoard"
+import {
+  getLabeledCells,
+  LabeledCell,
+  puzzleDimensions,
+} from "../../../puzzle-solver"
 
 const MONTHS = [
   "JAN",
@@ -21,6 +26,17 @@ const MONTHS = [
 
 const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
 
+const labelFor = (cell: LabeledCell): string => {
+  switch (cell.kind) {
+    case "month":
+      return MONTHS[cell.value]
+    case "day":
+      return String(cell.value).padStart(2, "0")
+    case "weekday":
+      return WEEKDAYS[cell.value]
+  }
+}
+
 export default function Board() {
   const {
     type,
@@ -36,62 +52,54 @@ export default function Board() {
     return <div className={styles.noSolution}>No solution found for this date.</div>
   }
 
-  const renderCells = (
-    rangeStart: number,
-    rowOffset: number,
-    colOffset: number,
-    labels: number[] | string[]
-  ) => {
-    return labels.map((e: number | string, i: number) => {
-      const index = rangeStart + i
-      const row = Math.floor(i / 7) + rowOffset
-      const col = (i % 7) + colOffset
+  const { ROWS, COLS } = puzzleDimensions[type]
+  const cellByPos = new Map(
+    getLabeledCells(type).map((cell) => [`${cell.row},${cell.col}`, cell])
+  )
 
-      if (!formattedSolutions[row]) return
-      return (
-        <Cell
-          key={index}
-          board={formattedSolutions}
-          row={row}
-          col={col}
-          onClick={() => updateDate(index)}
-        >
-          {typeof e === "string" ? e : e < 10 ? "0" + e : e}
-        </Cell>
-      )
-    })
+  // Walk the grid in row-major order, rendering a labeled Cell for every free
+  // position and a spacer for every wall. Positions and wall layout both come
+  // from the solver, so no calendar geometry is duplicated here.
+  const renderBoard = (): ReactElement[] => {
+    const elements: ReactElement[] = []
+    for (let row = 0; row < ROWS; row++) {
+      for (let col = 0; col < COLS; col++) {
+        const key = row * COLS + col
+        const cell = cellByPos.get(`${row},${col}`)
+        if (cell) {
+          elements.push(
+            <Cell
+              key={key}
+              board={formattedSolutions}
+              row={row}
+              col={col}
+              onClick={() => updateDate(cell.kind, cell.value)}
+            >
+              {labelFor(cell)}
+            </Cell>
+          )
+        } else {
+          const isBottomWall = row === ROWS - 1
+          const hasCellRight = cellByPos.has(`${row},${col + 1}`)
+          elements.push(
+            <div
+              key={key}
+              className={isBottomWall ? styles.spacer : styles.spacer2}
+              style={
+                isBottomWall && hasCellRight ? { borderRightWidth: 1.5 } : undefined
+              }
+            />
+          )
+        }
+      }
+    }
+    return elements
   }
 
   return (
     <>
       <div className={styles.board}>
-        <div className={styles.cellContainer}>
-          {renderCells(0, 0, 0, MONTHS.slice(0, 6))}
-          <div className={styles.spacer2}></div>
-          {renderCells(6, 1, 0, MONTHS.slice(6, 12))}
-          <div className={styles.spacer2}></div>
-          {renderCells(MONTHS.length, 2, 0, range(1, 32))}
-          {type === "STANDARD" ? (
-            <>
-              {renderCells(MONTHS.length + 31, 6, 3, WEEKDAYS.slice(0, 4))}
-              <div className={styles.spacer} />
-              <div className={styles.spacer} />
-              <div className={styles.spacer} />
-              <div
-                className={styles.spacer}
-                style={{ borderRightWidth: 1.5 }}
-              />
-              {renderCells(MONTHS.length + 35, 7, 4, WEEKDAYS.slice(4, 7))}
-            </>
-          ) : (
-            <>
-              <div className={styles.spacer} />
-              <div className={styles.spacer} />
-              <div className={styles.spacer} />
-              <div className={styles.spacer} />
-            </>
-          )}
-        </div>
+        <div className={styles.cellContainer}>{renderBoard()}</div>
       </div>
       <div className={styles.buttonContainer}>
         <Button disabled={count === 0} onClick={() => setCount(count - 1)}>

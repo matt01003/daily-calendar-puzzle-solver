@@ -103,23 +103,68 @@ export const getItemMasksAndFirstXCols = (category: PuzzleType) => {
 
 type Cell = { row: number; col: number }
 
-// Single source of truth for where the month/day/weekday labels live on the
-// board. The offsets below are geometric facts of this calendar layout and
-// must stay in sync with the index mapping in `useBoard.updateDate` and the
-// rendering offsets in `Board/index.tsx`.
+export type DateCellKind = "month" | "day" | "weekday"
+
+export type LabeledCell = {
+  kind: DateCellKind
+  value: number
+  row: number
+  col: number
+}
+
+// Single source of truth for the calendar layout: every labeled cell (month,
+// day, weekday) in flat order, with its board position. The flat index is the
+// array position. `getDateCells`, `useBoard.updateDate`, and the `Board`
+// renderer must all derive from this list so the geometry lives in one place.
+export const getLabeledCells = (type: PuzzleType): LabeledCell[] => {
+  const cells: LabeledCell[] = []
+
+  for (let month = 0; month < 12; month++) {
+    cells.push({
+      kind: "month",
+      value: month,
+      row: Math.floor(month / 6),
+      col: month % 6,
+    })
+  }
+  for (let day = 1; day <= 31; day++) {
+    cells.push({
+      kind: "day",
+      value: day,
+      row: Math.floor((day - 1) / 7) + 2,
+      col: (day - 1) % 7,
+    })
+  }
+  if (type === "STANDARD") {
+    for (let weekday = 0; weekday < 7; weekday++) {
+      cells.push({
+        kind: "weekday",
+        value: weekday,
+        row: weekday > 3 ? 7 : 6,
+        col: weekday > 3 ? weekday : weekday + 3,
+      })
+    }
+  }
+
+  return cells
+}
+
 export const getDateCells = (
   type: PuzzleType,
   date: PuzzleDate
 ): { month: Cell; day: Cell; weekday?: Cell } => {
-  const { month, day, weekday } = date
+  const cells = getLabeledCells(type)
+  const position = (kind: DateCellKind, value: number): Cell => {
+    const { row, col } = cells.find(
+      (cell) => cell.kind === kind && cell.value === value
+    )!
+    return { row, col }
+  }
 
   return {
-    month: { row: Math.floor(month / 6), col: month % 6 },
-    day: { row: Math.floor((day - 1) / 7) + 2, col: (day - 1) % 7 },
-    weekday:
-      type === "STANDARD"
-        ? { row: weekday > 3 ? 7 : 6, col: weekday > 3 ? weekday : weekday + 3 }
-        : undefined,
+    month: position("month", date.month),
+    day: position("day", date.day),
+    weekday: type === "STANDARD" ? position("weekday", date.weekday) : undefined,
   }
 }
 
