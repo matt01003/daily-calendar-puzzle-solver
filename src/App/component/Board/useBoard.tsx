@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { createBoard, formatSolution, PuzzleType } from "../../../puzzle-solver"
+import {
+  buildBoard,
+  formatSolution,
+  PuzzleType,
+  solve,
+} from "../../../puzzle-solver"
 
 type Orientation = {
   index: number
@@ -16,15 +21,12 @@ export default function useBoard() {
     weekday: new Date().getDay(),
   })
 
-  const boardSolver = useMemo(
-    () => createBoard(type, selectedDate),
-    [selectedDate, type]
-  )
+  const board = useMemo(() => buildBoard(type, selectedDate), [selectedDate, type])
 
   const formattedSolutions = useMemo(() => {
     if (!solutions.length) return null
     return formatSolution(type, solutions[count])
-  }, [solutions, count])
+  }, [type, solutions, count])
 
   const updateDate = useCallback((index: number) => {
     setSelectedDate((prev) => ({
@@ -38,10 +40,9 @@ export default function useBoard() {
   }, [])
 
   useEffect(() => {
-    const newSolutions = boardSolver.solve()
-    setSolutions(newSolutions)
+    setSolutions(solve(type, board))
     setCount(0)
-  }, [boardSolver])
+  }, [type, board])
 
   return {
     type,
