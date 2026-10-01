@@ -5,7 +5,7 @@ type Props = {
   children: ReactNode
   style?: React.CSSProperties
   disabled?: boolean
-  onClick: Function
+  onClick: () => void
 }
 
 export default function Button(props: Props) {

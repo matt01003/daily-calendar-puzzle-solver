@@ -7,7 +7,7 @@ type Props = {
   board: Board
   row: number
   col: number
-  onClick: Function
+  onClick: () => void
   children: ReactNode
 }
 
